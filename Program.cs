@@ -1,3 +1,5 @@
+using Microsoft.AspNetCore.Mvc;
+
 var builder = WebApplication.CreateBuilder(args);
 
 
@@ -14,7 +16,31 @@ if (app.Environment.IsDevelopment())
     app.UseSwaggerUI();
 }
 
+var meetups = new List<Meetup>();
+
 app.MapGet("/get-string", () => Results.Ok("it's ok this is the way how it suppose to works"));
+
+app.MapGet("/meetups", () => Results.Ok(meetups));
+
+app.MapDelete("/meetups/{id:guid}", ([FromRoute] Guid id) =>
+{
+    var meetupToDelete = meetups.SingleOrDefault(meetup => meetup.Id == id);
+
+    if (meetupToDelete is null)
+    {
+        return Results.NotFound();
+    }
+
+    meetups.Remove(meetupToDelete);
+    return Results.Ok(meetupToDelete);
+});
+
+app.MapPost("/meetups", ([FromBody] Meetup newMeetup) =>
+{
+    newMeetup.Id = Guid.NewGuid();
+    meetups.Add(newMeetup);
+    return Results.Ok(newMeetup);
+});
 
 app.Run();
 
