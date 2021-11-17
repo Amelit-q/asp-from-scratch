@@ -42,6 +42,22 @@ app.MapPost("/meetups", ([FromBody] Meetup newMeetup) =>
     return Results.Ok(newMeetup);
 });
 
+app.MapPut("/meetups/{id:guid}", ([FromRoute] Guid id, [FromBody] Meetup updatedMeetup) =>
+{
+    var prevMeetup = meetups.SingleOrDefault(meetup => meetup.Id == id);
+
+    if (prevMeetup is null)
+    {
+        return Results.NotFound();
+    }
+
+    prevMeetup.Topic = updatedMeetup.Topic;
+    prevMeetup.Duration = updatedMeetup.Duration;
+    prevMeetup.Place = updatedMeetup.Place;
+
+    return Results.NoContent();
+});
+
 app.Run();
 
 class Meetup
