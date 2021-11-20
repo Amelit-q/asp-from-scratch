@@ -32,7 +32,7 @@ public class MeetupController : ControllerBase
     }
 
     [HttpPut("{id:guid}")]
-    public IActionResult UpdateMeetup([FromRoute] Guid id, [FromBody] Meetup updatedMeetup)
+    public IActionResult UpdateMeetup([FromRoute] Guid id, [FromBody] UpdateMeetupDto updateDto)
     {
         var prevMeetup = Meetups.SingleOrDefault(meetup => meetup.Id == id);
 
@@ -41,9 +41,9 @@ public class MeetupController : ControllerBase
             return NotFound();
         }
 
-        prevMeetup.Topic = updatedMeetup.Topic;
-        prevMeetup.Duration = updatedMeetup.Duration;
-        prevMeetup.Place = updatedMeetup.Place;
+        prevMeetup.Topic = updateDto.Topic;
+        prevMeetup.Duration = updateDto.Duration;
+        prevMeetup.Place = updateDto.Place;
 
         return NoContent();
     }
@@ -51,10 +51,18 @@ public class MeetupController : ControllerBase
     [HttpGet]
     public IActionResult GetMeetups()
     {
-        return Ok(Meetups);
+        var readDtos = Meetups.Select(meetups => new ReadMeetupDto
+        {
+            Id = meetups.Id,
+            Topic = meetups.Topic,
+            Duration = meetups.Duration,
+            Place = meetups.Place
+        });
+
+        return Ok(readDtos);
     }
 
-    [HttpDelete]
+    [HttpDelete("{id:guid}")]
     public IActionResult DeleteMeetup([FromRoute] Guid id)
     {
         var meetupToDelete = Meetups.SingleOrDefault(meetup => meetup.Id == id);
@@ -65,14 +73,16 @@ public class MeetupController : ControllerBase
         }
 
         Meetups.Remove(meetupToDelete);
-        return Ok(meetupToDelete);
-    }
 
-    [HttpPost]
-    public IActionResult CreateMeetup([FromBody] Meetup newMeetup)
-    {
-        newMeetup.Id = Guid.NewGuid();
-        Meetups.Add(newMeetup);
-        return Ok(newMeetup);
+        var readDto = new ReadMeetupDto
+        {
+            Id = meetupToDelete.Id,
+            Duration = meetupToDelete.Duration,
+            Place = meetupToDelete.Place,
+            Topic = meetupToDelete.Topic
+        };
+
+
+        return Ok(readDto);
     }
 }
