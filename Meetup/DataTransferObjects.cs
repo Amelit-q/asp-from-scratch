@@ -22,7 +22,8 @@ public class CreateMeetupDto
     [RegularExpression(@"^[\w\s\.\d]*")]
     public string Place { get; set; }
 
-    [Required] [Range(30, 300)]
+    [Required]
+    [Range(30, 300)]
     public int Duration { get; set; }
 }
 
@@ -38,6 +39,7 @@ public class UpdateMeetupDto
     [RegularExpression(@"^[\w\s\.\d]*")]
     public string Place { get; set; }
 
-    [Required] [Range(30, 300)]
+    [Required]
+    [Range(30, 300)]
     public int Duration { get; set; }
 }

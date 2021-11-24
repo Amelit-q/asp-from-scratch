@@ -6,7 +6,7 @@ namespace AspFromScratch.WebApi.Meetup;
 [Route("/meetups")]
 public class MeetupController : ControllerBase
 {
-    private static readonly ICollection<Meetup> Meetups = new List<Meetup>();
+    private static readonly ICollection<MeetupEntity> Meetups = new List<MeetupEntity>();
 
 
     /// <summary>Creates new meetup</summary>
@@ -15,7 +15,7 @@ public class MeetupController : ControllerBase
     [ProducesResponseType(typeof(ReadMeetupDto), StatusCodes.Status200OK)]
     public IActionResult CreateMeetup([FromBody] CreateMeetupDto createDto)
     {
-        var newMeetup = new Meetup
+        var newMeetup = new MeetupEntity
         {
             Id = Guid.NewGuid(),
             Topic = createDto.Topic,

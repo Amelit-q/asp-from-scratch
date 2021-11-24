@@ -1,6 +1,6 @@
 ﻿namespace AspFromScratch.WebApi.Meetup;
 
-internal class Meetup
+internal class MeetupEntity
 {
     /// <summary>Meetup.id</summary>
     /// <example>xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx</example>
