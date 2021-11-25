@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 
 namespace AspFromScratch.WebApi.Meetup;
 
@@ -6,14 +7,13 @@ namespace AspFromScratch.WebApi.Meetup;
 [Route("/meetups")]
 public class MeetupController : ControllerBase
 {
-    private static readonly ICollection<MeetupEntity> Meetups = new List<MeetupEntity>();
-
+    private readonly DatabaseContext _context = new DatabaseContext();
 
     /// <summary>Creates new meetup</summary>
     /// <response code="200">Meetup was created</response>
     [HttpPost]
     [ProducesResponseType(typeof(ReadMeetupDto), StatusCodes.Status200OK)]
-    public IActionResult CreateMeetup([FromBody] CreateMeetupDto createDto)
+    public async Task<IActionResult> CreateMeetup([FromBody] CreateMeetupDto createDto)
     {
         var newMeetup = new MeetupEntity
         {
@@ -22,7 +22,9 @@ public class MeetupController : ControllerBase
             Place = createDto.Place,
             Duration = createDto.Duration
         };
-        Meetups.Add(newMeetup);
+
+        _context.Meetups.Add(newMeetup);
+        await _context.SaveChangesAsync();
 
         var readDto = new ReadMeetupDto
         {
@@ -41,9 +43,11 @@ public class MeetupController : ControllerBase
     [HttpPut("{id:guid}")]
     [ProducesResponseType(typeof(ReadMeetupDto), StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
-    public IActionResult UpdateMeetup([FromRoute] Guid id, [FromBody] UpdateMeetupDto updateDto)
+    public async Task<IActionResult> UpdateMeetup([FromRoute] Guid id, [FromBody] UpdateMeetupDto updateDto)
     {
-        var prevMeetup = Meetups.SingleOrDefault(meetup => meetup.Id == id);
+        // var prevMeetup = Meetups.SingleOrDefault(meetup => meetup.Id == id);
+
+        var prevMeetup = await _context.Meetups.SingleOrDefaultAsync(meetup => meetup.Id == id);
 
         if (prevMeetup is null)
         {
@@ -53,6 +57,7 @@ public class MeetupController : ControllerBase
         prevMeetup.Topic = updateDto.Topic;
         prevMeetup.Duration = updateDto.Duration;
         prevMeetup.Place = updateDto.Place;
+        await _context.SaveChangesAsync();
 
         return NoContent();
     }
@@ -63,14 +68,16 @@ public class MeetupController : ControllerBase
     [HttpGet]
     [ProducesResponseType(typeof(ReadMeetupDto), StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
-    public IActionResult GetMeetups()
+    public async Task<IActionResult> GetMeetups()
     {
-        var readDtos = Meetups.Select(meetups => new ReadMeetupDto
+        var meetups = await _context.Meetups.ToListAsync();
+
+        var readDtos = meetups.Select(meetup => new ReadMeetupDto
         {
-            Id = meetups.Id,
-            Topic = meetups.Topic,
-            Duration = meetups.Duration,
-            Place = meetups.Place
+            Id = meetup.Id,
+            Topic = meetup.Topic,
+            Duration = meetup.Duration,
+            Place = meetup.Place
         });
 
         return Ok(readDtos);
@@ -83,16 +90,19 @@ public class MeetupController : ControllerBase
     [HttpDelete("{id:guid}")]
     [ProducesResponseType(typeof(ReadMeetupDto), StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
-    public IActionResult DeleteMeetup([FromRoute] Guid id)
+    public async Task<IActionResult> DeleteMeetup([FromRoute] Guid id)
     {
-        var meetupToDelete = Meetups.SingleOrDefault(meetup => meetup.Id == id);
+        // var meetupToDelete = Meetups.SingleOrDefault(meetup => meetup.Id == id);
+
+        var meetupToDelete = await _context.Meetups.SingleOrDefaultAsync(meetup => meetup.Id == id);
 
         if (meetupToDelete is null)
         {
             return NotFound();
         }
 
-        Meetups.Remove(meetupToDelete);
+        _context.Meetups.Remove(meetupToDelete);
+        await _context.SaveChangesAsync();
 
         var readDto = new ReadMeetupDto
         {
