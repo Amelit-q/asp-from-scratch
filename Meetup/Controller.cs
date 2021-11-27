@@ -7,7 +7,9 @@ namespace AspFromScratch.WebApi.Meetup;
 [Route("/meetups")]
 public class MeetupController : ControllerBase
 {
-    private readonly DatabaseContext _context = new DatabaseContext();
+    private readonly DatabaseContext _context;
+
+    public MeetupController(DatabaseContext context) => _context = context;
 
     /// <summary>Creates new meetup</summary>
     /// <response code="200">Meetup was created</response>
