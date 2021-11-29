@@ -1,8 +1,10 @@
 ﻿using System.ComponentModel.DataAnnotations.Schema;
+using Microsoft.EntityFrameworkCore;
 
 namespace AspFromScratch.WebApi.User;
 
 [Table("users")]
+[Index(nameof(Username), IsUnique = true)]
 public class UserEntity
 {
     [Column("id")]
