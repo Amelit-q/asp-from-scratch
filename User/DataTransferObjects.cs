@@ -41,3 +41,27 @@ public class RegisterUserDto
     [RegularExpression(@"^[\w\s\d]*$")]
     public string Password { get; set; }
 }
+
+public class AuthenticateUserDto
+{
+    /// <summary>Username for authentication</summary>
+    /// <example>ivory_tony</example>
+    [Required]
+    public string Username { get; set; }
+
+    /// <summary>Password for authentication</summary>
+    /// <example>qwerty32324<example>
+    [Required]
+    public string Password { get; set; }
+}
+
+public class TokenPair
+{
+    /// <summary>JWT Access Token</summary>
+    /// <example>header.payload.signature</example>
+    public string AccessToken { get; set; }
+
+    /// <summary>JWT Refresh Token</summary>
+    /// <example>header.payload.signature</example>
+    public string RefreshToken { get; set; }
+}

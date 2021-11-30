@@ -10,6 +10,9 @@ public class DatabaseContext : DbContext
 
     public DbSet<UserEntity> Users { get; set; }
 
+
+    public DbSet<RefreshTokenEntity> RefreshTokens { get; set; }
+
     public DatabaseContext(DbContextOptions<DatabaseContext> options) : base(options)
     {
     }
