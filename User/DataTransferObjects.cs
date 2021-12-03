@@ -55,7 +55,7 @@ public class AuthenticateUserDto
     public string Password { get; set; }
 }
 
-public class TokenPair
+public class TokenPairDto
 {
     /// <summary>JWT Access Token</summary>
     /// <example>header.payload.signature</example>
