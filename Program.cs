@@ -3,6 +3,7 @@ using System.Reflection;
 using System.Text;
 using AspFromScratch.WebApi;
 using AspFromScratch.WebApi.Filters;
+using AspFromScratch.WebApi.Helpers;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -21,6 +22,7 @@ builder.Services.AddDbContext<DatabaseContext>(options =>
     options.UseNpgsql(connectionString);
 });
 builder.Services.AddControllers();
+builder.Services.AddScoped<JwtTokenHelper>();
 builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme).AddJwtBearer(options =>
 {
     var jwtSecret = Encoding.ASCII.GetBytes(configuration["JwtAuth:Secret"]);
