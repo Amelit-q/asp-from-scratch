@@ -23,6 +23,7 @@ builder.Services.AddDbContext<DatabaseContext>(options =>
 });
 builder.Services.AddControllers();
 builder.Services.AddScoped<JwtTokenHelper>();
+builder.Services.AddAutoMapper(Assembly.GetExecutingAssembly());
 builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme).AddJwtBearer(options =>
 {
     var jwtSecret = Encoding.ASCII.GetBytes(configuration["JwtAuth:Secret"]);
