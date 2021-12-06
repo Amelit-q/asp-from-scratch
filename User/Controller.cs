@@ -2,6 +2,7 @@
 using System.Security.Claims;
 using System.Text;
 using AspFromScratch.WebApi.Helpers;
+using AutoMapper;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -16,12 +17,15 @@ public class UserController : ControllerBase
     private readonly DatabaseContext _context;
     private readonly IConfiguration _configuration;
     private readonly JwtTokenHelper _tokenHelper;
+    private readonly IMapper _mapper;
 
-    public UserController(DatabaseContext context, IConfiguration configuration, JwtTokenHelper tokenHelper)
+    public UserController(DatabaseContext context, IConfiguration configuration, JwtTokenHelper tokenHelper,
+        IMapper mapper)
     {
         _context = context;
         _configuration = configuration;
         _tokenHelper = tokenHelper;
+        _mapper = mapper;
     }
 
 
@@ -37,12 +41,7 @@ public class UserController : ControllerBase
 
         var currentUser = await _context.Users.SingleAsync(user => user.Id == currentUserId);
 
-        var readDto = new ReadUserDto
-        {
-            Id = currentUser.Id,
-            DisplayName = currentUser.DisplayName,
-            Username = currentUser.Username
-        };
+        var readDto = _mapper.Map<UserEntity>(currentUser);
 
         return Ok(readDto);
     }
@@ -59,29 +58,16 @@ public class UserController : ControllerBase
     {
         var usernameTaken = await _context.Users.AnyAsync(user => user.Username == registerDto.Username);
 
-
         if (usernameTaken)
         {
             return Conflict("Username already taken.");
         }
 
-        var newUser = new UserEntity
-        {
-            Id = Guid.NewGuid(),
-            DisplayName = registerDto.DisplayName,
-            Username = registerDto.Username,
-            Password = registerDto.Password
-        };
-
+        var newUser = _mapper.Map<UserEntity>(registerDto);
         _context.Users.Add(newUser);
         await _context.SaveChangesAsync();
 
-        var readDto = new ReadUserDto
-        {
-            Id = newUser.Id,
-            DisplayName = newUser.DisplayName,
-            Username = newUser.Username
-        };
+        var readDto = _mapper.Map<ReadUserDto>(newUser);
         return Ok(readDto);
     }
 
@@ -118,11 +104,7 @@ public class UserController : ControllerBase
         await _context.SaveChangesAsync();
 
         var tokenPair = _tokenHelper.IssueTokenPair(user.Id, refreshTokenEntity.Id);
-        var tokenPairDto = new TokenPairDto
-        {
-            AccessToken = tokenPair.AccessToken,
-            RefreshToken = tokenPair.RefreshToken
-        };
+        var tokenPairDto = _mapper.Map<TokenPairDto>(tokenPair);
         return Ok(tokenPairDto);
     }
 
@@ -165,11 +147,7 @@ public class UserController : ControllerBase
         await _context.SaveChangesAsync();
 
         var tokenPair = _tokenHelper.IssueTokenPair(userId, refreshTokenEntity.Id);
-        var tokenPairDto = new TokenPairDto
-        {
-            AccessToken = tokenPair.AccessToken,
-            RefreshToken = tokenPair.RefreshToken
-        };
+        var tokenPairDto = _mapper.Map<TokenPairDto>(tokenPair);
         return Ok(tokenPairDto);
     }
 }
